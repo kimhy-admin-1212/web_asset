@@ -13,8 +13,8 @@ async function checkAccess() {
     .eq("folder_name", currentFolder)
     .single();
 
-  if (error || !data || data.status !== 0) {
-    window.location.href = "/error.html"; // 👈 chuyển hướng đến error.html
+  if (error || !data || Number(data.status) !== 0) {
+    window.location.href = "/error.html";
   } else {
     document.body.style.display = "block";
   }
@@ -22,3 +22,4 @@ async function checkAccess() {
 
 document.body.style.display = "none";
 checkAccess();
+window.addEventListener("DOMContentLoaded", checkAccess);

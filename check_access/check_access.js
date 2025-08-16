@@ -28,6 +28,25 @@ async function checkAccess() {
     window.location.href = "/error.html";
   } else {
     document.body.style.display = "block";
+
+    document.addEventListener("contextmenu", (e) => e.preventDefault());
+    document.addEventListener("keydown", (e) => {
+      if (
+        e.key === "F12" ||
+        (e.ctrlKey && e.shiftKey && ["I", "J"].includes(e.key)) ||
+        (e.ctrlKey && e.key === "U")
+      ) {
+        e.preventDefault();
+        alert("Không được phép!");
+      }
+    });
+
+    // 🛑 Cảnh báo trong Console
+    console.log("%cDừng lại!", "font-size:48px;font-weight:bold;color:red;");
+    console.log(
+      "%cĐây là tính năng của trình duyệt cho nhà phát triển. Đừng dán code lạ vào đây, bạn có thể bị lừa mất tài khoản.",
+      "font-size:16px;"
+    );
   }
 }
 

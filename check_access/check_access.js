@@ -31,10 +31,11 @@ async function checkAccess() {
 
     document.addEventListener("contextmenu", (e) => e.preventDefault());
     document.addEventListener("keydown", (e) => {
+      const key = e.key.toLowerCase();
       if (
         e.key === "F12" ||
-        (e.ctrlKey && e.shiftKey && ["I", "J"].includes(e.key)) ||
-        (e.ctrlKey && e.key === "U")
+        (e.ctrlKey && e.shiftKey && ["i", "j"].includes(key)) ||
+        (e.ctrlKey && key === "u")
       ) {
         e.preventDefault();
         alert("Không được phép!");

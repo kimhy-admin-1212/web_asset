@@ -35,7 +35,8 @@ async function checkAccess() {
       if (
         e.key === "F12" ||
         (e.ctrlKey && e.shiftKey && ["i", "j"].includes(key)) ||
-        (e.ctrlKey && key === "u")
+        (e.ctrlKey && key === "u") ||
+        (e.ctrlKey && key === "s")
       ) {
         e.preventDefault();
         alert("Không được phép!");

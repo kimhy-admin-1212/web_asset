@@ -11,55 +11,49 @@ const supabase = window.supabase.createClient(
   window.SUPABASE_KEY
 );
 
+// ✅ Lấy tên thư mục từ URL
 const currentFolder = window.location.pathname.split("/")[1];
 
 // ✅ Ẩn body trước khi kiểm tra
-document.addEventListener("DOMContentLoaded", () => {
-  document.body.style.visibility = "hidden"; // chỉ ẩn tạm
-});
+document.body.style.display = "none";
 
 async function checkAccess() {
   const { data, error } = await supabase
     .from("themes_status")
-    .select("id, status")
+    .select("status")
     .eq("folder_name", currentFolder)
     .single();
 
   if (error || !data || Number(data.status) !== 0) {
     window.location.href = "/error.html";
-    return;
   } else {
-    document.body.style.visibility = "visible"; // hiện lại
-
     (function () {
+      // 🔒 Body ẩn trước
+      document.body.style.display = "none";
+
+      // 🔑 Hàm giải mã Base64
+      function d(b) {
+        return atob(b);
+      }
+
+      // 🚫 Cảnh báo console
       console.log("%cSTOP!", "font-size:48px;font-weight:bold;color:red;");
       console.log(
         "%cĐây là khu vực nhà phát triển. Đừng dán code lạ vào đây!",
         "font-size:16px"
       );
 
-      let antiDevInterval;
-
       // 🔎 Hàm chống DevTools
-      async function antiDev() {
+      function antiDev() {
         if (
           window.outerWidth - window.innerWidth > 160 ||
           window.outerHeight - window.innerHeight > 160
         ) {
-          try {
-            await supabase
-              .from("themes_status")
-              .update({ status: 1 })
-              .eq("id", data.id);
-          } catch (err) {
-            console.error("Lỗi update:", err);
-          }
-          clearInterval(antiDevInterval);
           window.location.href = "/error.html";
         }
       }
 
-      // ⛔ Chặn phím tắt
+      // ⛔ Hàm chặn phím tắt
       function blockKeys() {
         document.addEventListener("contextmenu", (e) => e.preventDefault());
         document.addEventListener("keydown", (e) => {
@@ -75,7 +69,7 @@ async function checkAccess() {
         });
       }
 
-      // 🛡️ Anti-debug
+      // 🛡️ Anti-debug (tự kiểm tra thời gian chạy)
       function antiDebug() {
         setInterval(function () {
           const s = performance.now();
@@ -86,7 +80,7 @@ async function checkAccess() {
         }, 1000);
       }
 
-      // 🌀 Self-defending
+      // 🌀 Self-defending: nếu ai đó cố sửa code => vỡ
       setInterval(function () {
         try {
           (function f() {
@@ -95,17 +89,18 @@ async function checkAccess() {
         } catch (err) {
           window.location.href = "/error.html";
         }
-      }, 5000);
+      }, 2000);
 
       // 🚀 Khởi chạy
       window.addEventListener("load", () => {
         document.body.style.display = "block";
         blockKeys();
         antiDebug();
-        antiDevInterval = setInterval(antiDev, 1000);
+        setInterval(antiDev, 1000);
       });
     })();
   }
 }
 
+// ✅ Gọi hàm sau khi DOM đã sẵn sàng
 window.addEventListener("DOMContentLoaded", checkAccess);

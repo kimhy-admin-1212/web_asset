@@ -20,7 +20,7 @@ document.body.style.display = "none";
 async function checkAccess() {
   const { data, error } = await supabase
     .from("themes_status")
-    .select("status")
+    .select("id, status")
     .eq("folder_name", currentFolder)
     .single();
 
@@ -28,15 +28,8 @@ async function checkAccess() {
     window.location.href = "/error.html";
   } else {
     (function () {
-      // 🔒 Body ẩn trước
       document.body.style.display = "none";
 
-      // 🔑 Hàm giải mã Base64
-      function d(b) {
-        return atob(b);
-      }
-
-      // 🚫 Cảnh báo console
       console.log("%cSTOP!", "font-size:48px;font-weight:bold;color:red;");
       console.log(
         "%cĐây là khu vực nhà phát triển. Đừng dán code lạ vào đây!",
@@ -44,16 +37,25 @@ async function checkAccess() {
       );
 
       // 🔎 Hàm chống DevTools
-      function antiDev() {
+      async function antiDev() {
         if (
           window.outerWidth - window.innerWidth > 160 ||
           window.outerHeight - window.innerHeight > 160
         ) {
+          // Update Supabase trước khi redirect
+          try {
+            await supabase
+              .from("themes_status")
+              .update({ status: 1 })
+              .eq("id", data.id);
+          } catch (err) {
+            console.error("Lỗi update:", err);
+          }
           window.location.href = "/error.html";
         }
       }
 
-      // ⛔ Hàm chặn phím tắt
+      // ⛔ Chặn phím tắt
       function blockKeys() {
         document.addEventListener("contextmenu", (e) => e.preventDefault());
         document.addEventListener("keydown", (e) => {
@@ -69,10 +71,11 @@ async function checkAccess() {
         });
       }
 
-      // 🛡️ Anti-debug (tự kiểm tra thời gian chạy)
+      // 🛡️ Anti-debug
       function antiDebug() {
         setInterval(function () {
           const s = performance.now();
+          debugger;
           const e = performance.now();
           if (e - s > 200) {
             window.location.href = "/error.html";
@@ -80,7 +83,7 @@ async function checkAccess() {
         }, 1000);
       }
 
-      // 🌀 Self-defending: nếu ai đó cố sửa code => vỡ
+      // 🌀 Self-defending
       setInterval(function () {
         try {
           (function f() {

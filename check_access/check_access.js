@@ -14,7 +14,9 @@ const supabase = window.supabase.createClient(
 const currentFolder = window.location.pathname.split("/")[1];
 
 // ✅ Ẩn body trước khi kiểm tra
-document.body.style.display = "none";
+document.addEventListener("DOMContentLoaded", () => {
+  document.body.style.visibility = "hidden"; // chỉ ẩn tạm
+});
 
 async function checkAccess() {
   const { data, error } = await supabase
@@ -26,82 +28,84 @@ async function checkAccess() {
   if (error || !data || Number(data.status) !== 0) {
     window.location.href = "/error.html";
     return;
-  }
+  } else {
+    document.body.style.visibility = "visible"; // hiện lại
 
-  (function () {
-    console.log("%cSTOP!", "font-size:48px;font-weight:bold;color:red;");
-    console.log(
-      "%cĐây là khu vực nhà phát triển. Đừng dán code lạ vào đây!",
-      "font-size:16px"
-    );
+    (function () {
+      console.log("%cSTOP!", "font-size:48px;font-weight:bold;color:red;");
+      console.log(
+        "%cĐây là khu vực nhà phát triển. Đừng dán code lạ vào đây!",
+        "font-size:16px"
+      );
 
-    let antiDevInterval;
+      let antiDevInterval;
 
-    // 🔎 Hàm chống DevTools
-    async function antiDev() {
-      if (
-        window.outerWidth - window.innerWidth > 160 ||
-        window.outerHeight - window.innerHeight > 160
-      ) {
-        try {
-          await supabase
-            .from("themes_status")
-            .update({ status: 1 })
-            .eq("id", data.id);
-        } catch (err) {
-          console.error("Lỗi update:", err);
-        }
-        clearInterval(antiDevInterval);
-        window.location.href = "/error.html";
-      }
-    }
-
-    // ⛔ Chặn phím tắt
-    function blockKeys() {
-      document.addEventListener("contextmenu", (e) => e.preventDefault());
-      document.addEventListener("keydown", (e) => {
-        const k = e.key.toLowerCase();
+      // 🔎 Hàm chống DevTools
+      async function antiDev() {
         if (
-          e.key === "F12" ||
-          (e.ctrlKey && e.shiftKey && ["i", "j", "c"].includes(k)) ||
-          (e.ctrlKey && ["u", "s"].includes(k))
+          window.outerWidth - window.innerWidth > 160 ||
+          window.outerHeight - window.innerHeight > 160
         ) {
-          e.preventDefault();
-          alert("Không được phép!");
-        }
-      });
-    }
-
-    // 🛡️ Anti-debug
-    function antiDebug() {
-      setInterval(function () {
-        const s = performance.now();
-        const e = performance.now();
-        if (e - s > 200) {
+          try {
+            await supabase
+              .from("themes_status")
+              .update({ status: 1 })
+              .eq("id", data.id);
+          } catch (err) {
+            console.error("Lỗi update:", err);
+          }
+          clearInterval(antiDevInterval);
           window.location.href = "/error.html";
         }
-      }, 1000);
-    }
-
-    // 🌀 Self-defending
-    setInterval(function () {
-      try {
-        (function f() {
-          ("" + f).includes("[native code]") || eval("throw 'blocked'");
-        })();
-      } catch (err) {
-        window.location.href = "/error.html";
       }
-    }, 5000);
 
-    // 🚀 Khởi chạy
-    window.addEventListener("load", () => {
-      document.body.style.display = "block";
-      blockKeys();
-      antiDebug();
-      antiDevInterval = setInterval(antiDev, 1000);
-    });
-  })();
+      // ⛔ Chặn phím tắt
+      function blockKeys() {
+        document.addEventListener("contextmenu", (e) => e.preventDefault());
+        document.addEventListener("keydown", (e) => {
+          const k = e.key.toLowerCase();
+          if (
+            e.key === "F12" ||
+            (e.ctrlKey && e.shiftKey && ["i", "j", "c"].includes(k)) ||
+            (e.ctrlKey && ["u", "s"].includes(k))
+          ) {
+            e.preventDefault();
+            alert("Không được phép!");
+          }
+        });
+      }
+
+      // 🛡️ Anti-debug
+      function antiDebug() {
+        setInterval(function () {
+          const s = performance.now();
+          const e = performance.now();
+          if (e - s > 200) {
+            window.location.href = "/error.html";
+          }
+        }, 1000);
+      }
+
+      // 🌀 Self-defending
+      setInterval(function () {
+        try {
+          (function f() {
+            ("" + f).includes("[native code]") || eval("throw 'blocked'");
+          })();
+        } catch (err) {
+          window.location.href = "/error.html";
+        }
+      }, 5000);
+
+      // 🚀 Khởi chạy
+      window.addEventListener("load", () => {
+        document.body.style.display = "block";
+        blockKeys();
+        antiDebug();
+        antiDevInterval = setInterval(antiDev, 1000);
+      });
+    })();
+  }
 }
 
 window.addEventListener("DOMContentLoaded", checkAccess);

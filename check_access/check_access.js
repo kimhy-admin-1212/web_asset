@@ -1,13 +1,8 @@
-// --- check_access.js (fixed & hardened) ---
-
-// 1) Bảo đảm thư viện Supabase đã có
 if (!window.supabase || !window.supabase.createClient) {
   console.error(
     "Supabase UMD chưa sẵn sàng – hãy đặt script Supabase trước file này (và dùng defer)."
   );
 }
-
-// 2) Chỉ gán nếu chưa có (tránh redeclare)
 if (!window.SUPABASE_URL || !window.SUPABASE_KEY) {
   window.SUPABASE_URL = "https://quoniplztuaxcqncuirq.supabase.co";
   window.SUPABASE_KEY =

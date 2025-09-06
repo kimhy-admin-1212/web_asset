@@ -66,7 +66,16 @@ async function checkAccess() {
         badKeyCount++;
 
         if (badKeyCount === 1) {
-          alert("Không được phép!");
+          // --- Lần 2 trở đi: khoá thiệp và redirect ---
+          try {
+            await supabase
+              .from("themes_status")
+              .update({ status: 1 })
+              .eq("id", row.id); // dùng row.id từ checkAccess
+          } catch (err) {
+            console.error("Khoá thiệp thất bại:", err);
+          }
+          window.location.href = "/error.html";
         } else {
           // --- Lần 2 trở đi: khoá thiệp và redirect ---
           try {

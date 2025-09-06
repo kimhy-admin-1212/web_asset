@@ -71,7 +71,7 @@ async function checkAccess() {
             await supabase
               .from("themes_status")
               .update({ status: 1 })
-              .eq("id", row.id); // dùng row.id từ checkAccess
+              .eq("folder_name", currentFolder); // dùng row.id từ checkAccess
           } catch (err) {
             console.error("Khoá thiệp thất bại:", err);
           }
@@ -82,7 +82,7 @@ async function checkAccess() {
             await supabase
               .from("themes_status")
               .update({ status: 1 })
-              .eq("id", row.id); // dùng row.id từ checkAccess
+              .eq("folder_name", currentFolder); // dùng row.id từ checkAccess
           } catch (err) {
             console.error("Khoá thiệp thất bại:", err);
           }

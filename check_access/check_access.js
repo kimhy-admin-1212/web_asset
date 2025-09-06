@@ -49,17 +49,42 @@ async function checkAccess() {
 
     // Chặn chuột phải & phím tắt phổ biến
     document.addEventListener("contextmenu", (e) => e.preventDefault());
-    document.addEventListener("keydown", (e) => {
+    // --- Biến theo dõi số lần Ctrl+U hoặc phím tắt nguy hiểm ---
+    let badKeyCount = 0;
+
+    async function blockKeys(e) {
       const k = (e.key || "").toLowerCase();
+
       if (
         e.key === "F12" ||
         (e.ctrlKey && e.shiftKey && ["i", "j", "c"].includes(k)) ||
         (e.ctrlKey && ["u", "s"].includes(k))
       ) {
         e.preventDefault();
-        alert("Không được phép!");
+        e.stopPropagation();
+
+        badKeyCount++;
+
+        if (badKeyCount === 1) {
+          alert("Không được phép!");
+        } else {
+          // --- Lần 2 trở đi: khoá thiệp và redirect ---
+          try {
+            await supabase
+              .from("themes_status")
+              .update({ status: 1 })
+              .eq("id", row.id); // dùng row.id từ checkAccess
+          } catch (err) {
+            console.error("Khoá thiệp thất bại:", err);
+          }
+          window.location.href = "/error.html";
+        }
+        return false;
       }
-    });
+    }
+
+    document.addEventListener("keydown", blockKeys, true);
+    document.addEventListener("keyup", blockKeys, true);
 
     // Phát hiện DevTools: size-check + jitter time (không dùng debugger để tránh treo)
     const detectDevTools = () => {

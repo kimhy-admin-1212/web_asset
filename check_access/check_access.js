@@ -67,25 +67,25 @@ async function checkAccess() {
 
         if (badKeyCount === 1) {
           // --- Lần 2 trở đi: khoá thiệp và redirect ---
-          try {
-            await supabase
-              .from("themes_status")
-              .update({ status: 1 })
-              .eq("folder_name", currentFolder); // dùng row.id từ checkAccess
-          } catch (err) {
-            console.error("Khoá thiệp thất bại:", err);
-          }
+          // try {
+          //   await supabase
+          //     .from("themes_status")
+          //     .update({ status: 1 })
+          //     .eq("folder_name", currentFolder); // dùng row.id từ checkAccess
+          // } catch (err) {
+          //   console.error("Khoá thiệp thất bại:", err);
+          // }
           window.location.href = "/error.html";
         } else {
           // --- Lần 2 trở đi: khoá thiệp và redirect ---
-          try {
-            await supabase
-              .from("themes_status")
-              .update({ status: 1 })
-              .eq("folder_name", currentFolder); // dùng row.id từ checkAccess
-          } catch (err) {
-            console.error("Khoá thiệp thất bại:", err);
-          }
+          // try {
+          //   await supabase
+          //     .from("themes_status")
+          //     .update({ status: 1 })
+          //     .eq("folder_name", currentFolder); // dùng row.id từ checkAccess
+          // } catch (err) {
+          //   console.error("Khoá thiệp thất bại:", err);
+          // }
           window.location.href = "/error.html";
         }
         return false;
@@ -112,14 +112,14 @@ async function checkAccess() {
       try {
         if (detectDevTools()) {
           clearInterval(antiDevTimer);
-          try {
-            await supabase
-              .from("themes_status")
-              .update({ status: 1 })
-              .eq("id", row.id);
-          } catch (e) {
-            console.error("Update status thất bại:", e);
-          }
+          // try {
+          //   await supabase
+          //     .from("themes_status")
+          //     .update({ status: 1 })
+          //     .eq("id", row.id);
+          // } catch (e) {
+          //   console.error("Update status thất bại:", e);
+          // }
           window.location.href = "/error.html";
         }
       } catch (e) {

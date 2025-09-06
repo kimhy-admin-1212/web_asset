@@ -99,13 +99,13 @@ async function checkAccess() {
     const detectDevTools = () => {
       const gapW = Math.abs(window.outerWidth - window.innerWidth);
       const gapH = Math.abs(window.outerHeight - window.innerHeight);
-      if (gapW > 160 || gapH > 160) return true;
+      if (gapW > 300 || gapH > 300) return true;
 
       // Jitter timing: công việc nhỏ rồi đo thời gian
       const t0 = performance.now();
       for (let i = 0; i < 1e5; i++); // vòng lặp nhẹ
       const t1 = performance.now();
-      return t1 - t0 > 60; // ngưỡng tuỳ trình duyệt
+      return t1 - t0 > 200; // ngưỡng tuỳ trình duyệt
     };
 
     let antiDevTimer = setInterval(async () => {
@@ -132,9 +132,13 @@ async function checkAccess() {
     // Self-defending (giảm tải xuống 5s/lần)
     setInterval(() => {
       try {
-        (function f() {
-          ("" + f).includes("[native code]") || eval("throw 'blocked'");
-        })();
+        // Chỉ check nếu có console mở
+        if (
+          window.console &&
+          console.log.toString().indexOf("[native code]") === -1
+        ) {
+          throw "blocked";
+        }
       } catch {
         window.location.href = "/error.html";
       }

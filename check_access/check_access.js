@@ -31,7 +31,7 @@ async function checkAccess() {
       .from("themes_status")
       .select("id, status")
       .eq("folder_name", currentFolder)
-      .maybeSingle(); // an toàn hơn .single()
+      .maybeSingle();
 
     row = data || null;
 
@@ -40,99 +40,83 @@ async function checkAccess() {
       return;
     }
 
-    // --- ĐÃ PASS: bật nội dung & setup chống copy/devtools ---
+    // --- ĐÃ PASS: bật nội dung & setup bảo vệ ---
     console.log("%cSTOP!", "font-size:48px;font-weight:bold;color:red;");
     console.log(
       "%cĐây là khu vực nhà phát triển. Đừng dán code lạ vào đây!",
       "font-size:16px"
     );
 
-    // Chặn chuột phải & phím tắt phổ biến
-    document.addEventListener("contextmenu", (e) => e.preventDefault());
-    // --- Biến theo dõi số lần Ctrl+U hoặc phím tắt nguy hiểm ---
-    let badKeyCount = 0;
+    const isMobile = /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent);
 
-    async function blockKeys(e) {
-      const k = (e.key || "").toLowerCase();
+    if (isMobile) {
+      // --- MOBILE: chống copy, chống long-press ---
+      document.addEventListener("copy", (e) => e.preventDefault());
+      document.addEventListener("cut", (e) => e.preventDefault());
+      document.addEventListener("selectstart", (e) => e.preventDefault());
 
-      if (
-        e.key === "F12" ||
-        (e.ctrlKey && e.shiftKey && ["i", "j", "c"].includes(k)) ||
-        (e.ctrlKey && ["u", "s"].includes(k))
-      ) {
-        e.preventDefault();
-        e.stopPropagation();
+      // Chặn menu long-press
+      document.addEventListener(
+        "touchstart",
+        function preventLongPress(e) {
+          if (e.touches.length > 1) return; // cho phép zoom 2 ngón
+          e.preventDefault();
+        },
+        { passive: false }
+      );
+    } else {
+      // --- DESKTOP: chống chuột phải + phím tắt ---
+      document.addEventListener("contextmenu", (e) => e.preventDefault());
 
-        badKeyCount++;
+      let badKeyCount = 0;
+      async function blockKeys(e) {
+        const k = (e.key || "").toLowerCase();
 
-        if (badKeyCount === 1) {
-          // --- Lần 2 trở đi: khoá thiệp và redirect ---
-          // try {
-          //   await supabase
-          //     .from("themes_status")
-          //     .update({ status: 1 })
-          //     .eq("folder_name", currentFolder); // dùng row.id từ checkAccess
-          // } catch (err) {
-          //   console.error("Khoá thiệp thất bại:", err);
-          // }
+        if (
+          e.key === "F12" ||
+          (e.ctrlKey && e.shiftKey && ["i", "j", "c"].includes(k)) ||
+          (e.ctrlKey && ["u", "s"].includes(k))
+        ) {
+          e.preventDefault();
+          e.stopPropagation();
+
+          badKeyCount++;
           window.location.href = "/error.html";
-        } else {
-          // --- Lần 2 trở đi: khoá thiệp và redirect ---
-          // try {
-          //   await supabase
-          //     .from("themes_status")
-          //     .update({ status: 1 })
-          //     .eq("folder_name", currentFolder); // dùng row.id từ checkAccess
-          // } catch (err) {
-          //   console.error("Khoá thiệp thất bại:", err);
-          // }
+          return false;
+        }
+      }
+      document.addEventListener("keydown", blockKeys, true);
+      document.addEventListener("keyup", blockKeys, true);
+
+      // --- Phát hiện DevTools ---
+      const detectDevTools = () => {
+        const gapW = Math.abs(window.outerWidth - window.innerWidth);
+        const gapH = Math.abs(window.outerHeight - window.innerHeight);
+        if (gapW > 300 || gapH > 300) return true;
+
+        // Jitter timing
+        const t0 = performance.now();
+        for (let i = 0; i < 1e5; i++);
+        const t1 = performance.now();
+        return t1 - t0 > 200;
+      };
+
+      let antiDevTimer = setInterval(async () => {
+        try {
+          if (detectDevTools()) {
+            clearInterval(antiDevTimer);
+            window.location.href = "/error.html";
+          }
+        } catch (e) {
+          clearInterval(antiDevTimer);
           window.location.href = "/error.html";
         }
-        return false;
-      }
+      }, 800);
     }
 
-    document.addEventListener("keydown", blockKeys, true);
-    document.addEventListener("keyup", blockKeys, true);
-
-    // Phát hiện DevTools: size-check + jitter time (không dùng debugger để tránh treo)
-    const detectDevTools = () => {
-      const gapW = Math.abs(window.outerWidth - window.innerWidth);
-      const gapH = Math.abs(window.outerHeight - window.innerHeight);
-      if (gapW > 300 || gapH > 300) return true;
-
-      // Jitter timing: công việc nhỏ rồi đo thời gian
-      const t0 = performance.now();
-      for (let i = 0; i < 1e5; i++); // vòng lặp nhẹ
-      const t1 = performance.now();
-      return t1 - t0 > 200; // ngưỡng tuỳ trình duyệt
-    };
-
-    let antiDevTimer = setInterval(async () => {
-      try {
-        if (detectDevTools()) {
-          clearInterval(antiDevTimer);
-          // try {
-          //   await supabase
-          //     .from("themes_status")
-          //     .update({ status: 1 })
-          //     .eq("id", row.id);
-          // } catch (e) {
-          //   console.error("Update status thất bại:", e);
-          // }
-          window.location.href = "/error.html";
-        }
-      } catch (e) {
-        // Bất kỳ lỗi nào cũng chuyển hướng phòng thủ
-        clearInterval(antiDevTimer);
-        window.location.href = "/error.html";
-      }
-    }, 800);
-
-    // Self-defending (giảm tải xuống 5s/lần)
+    // --- Self-defending (cả mobile & desktop) ---
     setInterval(() => {
       try {
-        // Chỉ check nếu có console mở
         if (
           window.console &&
           console.log.toString().indexOf("[native code]") === -1
@@ -147,7 +131,7 @@ async function checkAccess() {
     console.error("Lỗi checkAccess:", err);
     window.location.href = "/error.html";
   } finally {
-    // Luôn hiện lại nội dung tránh trắng trang khi có lỗi JS khác
+    // Luôn hiện lại nội dung tránh trắng trang khi có lỗi khác
     document.body.style.visibility = "visible";
   }
 }

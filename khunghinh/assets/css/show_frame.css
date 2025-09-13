@@ -1,0 +1,155 @@
+.wrapper-content>.item {
+    max-width: 502px;
+    margin: 0px auto;
+}
+
+.wrapper-content>.item>.wrapper-image {
+    border: 1px dashed grey;
+    padding: 25px;
+}
+
+.wrapper-content>.item>.wrapper-image>.image {
+    box-shadow: rgba(18, 18, 20, 0.2) 0px 7px 29px 0px;
+    position: relative;
+    overflow: hidden;
+}
+
+#transparent>img {
+    position: absolute;
+    width: 100%;
+    top: 0;
+    left: 0;
+}
+
+#transparent>img:first-child {
+    z-index: 1;
+    pointer-events: none;
+}
+
+#transparent>img:last-child {
+    max-width: 200px;
+    z-index: 0;
+    cursor: grab;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.wrapper-image>.setting .list-frames {
+    display: flex;
+    justify-content: center;
+    list-style: none;
+    padding: 0px;
+    margin: 0px;
+}
+
+.wrapper-image>.setting .list-frames>.item {
+    flex-basis: 17%;
+    margin: 0px 5px;
+}
+
+.wrapper-image>.setting .list-frames>.item>img {
+    cursor: pointer;
+}
+
+.wrapper-image>.setting .list-frames>.item>img.active {
+    border: 3px solid rgb(175, 10, 10);
+}
+
+#type {
+    display: inline-block;
+    padding: 5px 15px;
+    border-radius: 20px;
+    color: white;
+}
+
+#zoom-range,
+#rotate-range {
+    appearance: auto;
+}
+.box {
+    position: relative;
+    padding: 30px 20px;
+    border: 1px dashed #333;
+    border-radius: 10px;
+    max-width: 500px;
+    margin: auto;
+}
+
+.box .box-title {
+    font-weight: bold;
+    position: absolute;
+    top: -11px;
+    left: 5px;
+    background-color: #fff;
+    padding: 0 10px;
+    font-size: 16px;
+}
+
+.share-button-list {
+    display: flex;
+    justify-content: center;
+}
+
+.social-btn {
+    color: #fff;
+    width: 80px;
+    height: 36px;
+    border: none;
+    line-height: 0;
+    font-size: 18px;
+    margin: auto;
+    display: block;
+    border-radius: 5px;
+    overflow: hidden;
+}
+
+.share-button-list .social-btn {
+    margin: 0 5px;
+}
+
+.facebook-share-btn {
+    background-color: #3b6bd9;
+}
+
+.twitter-share-btn {
+    background-color: #333333;
+}
+
+.telegram-share-btn {
+    background-color: #179cde;
+}
+
+.copy-box {
+    width: 100%;
+    position: relative;
+    cursor: pointer;
+}
+
+.copy-box input {
+    width: 100%;
+    height: 40px;
+}
+
+.copy-box span {
+    position: absolute;
+    right: 3px;
+    color: #616368;
+    background-color: #fff;
+    height: 38px;
+    width: 32px;
+    top: 1px;
+    padding: 9px 8px;
+    border-left: 1px solid #D7D6DA;
+}
+
+.qr-code {
+    width: 100px;
+    height: 100px;
+    margin: auto;
+    overflow: hidden;
+}
+
+.qr-code img {
+    max-width: 100%;
+}

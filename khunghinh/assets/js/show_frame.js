@@ -149,8 +149,8 @@ function saveAsImage() {
   html2canvas(transparentDiv.get(0), {
     scrollX: 500,
     scale: scaleResponsive,
-    width: 420.5,
-    height: 420.5,
+    width: 400.5,
+    height: 400.5,
   }).then(function (canvas) {
     canvas.toBlob(function (blob) {
       var url = URL.createObjectURL(blob);

@@ -1,3 +1,18 @@
+if (!window.supabase || !window.supabase.createClient) {
+  console.error(
+    "Supabase UMD chưa sẵn sàng – hãy đặt script Supabase trước file này (và dùng defer)."
+  );
+}
+if (!window.SUPABASE_URL || !window.SUPABASE_KEY) {
+  window.SUPABASE_URL = "https://quoniplztuaxcqncuirq.supabase.co";
+  window.SUPABASE_KEY =
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF1b25pcGx6dHVheGNxbmN1aXJxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTAwNTYxNjgsImV4cCI6MjA2NTYzMjE2OH0.nw0p8kBuV_-FuqZ0LtY8FEGPIFLUhzlWgn31ZbRWS-4";
+}
+
+const supabase = window.supabase.createClient(
+  window.SUPABASE_URL,
+  window.SUPABASE_KEY
+);
 // Ẩn nội dung trước khi pass
 document.addEventListener("DOMContentLoaded", () => {
   document.body.style.visibility = "hidden";

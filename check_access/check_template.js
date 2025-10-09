@@ -13,6 +13,7 @@ const supabase = window.supabase.createClient(
   window.SUPABASE_URL,
   window.SUPABASE_KEY
 );
+
 // Ẩn nội dung trước khi pass
 document.addEventListener("DOMContentLoaded", () => {
   document.body.style.visibility = "hidden";
@@ -20,6 +21,29 @@ document.addEventListener("DOMContentLoaded", () => {
 
 async function checkAccess() {
   try {
+    // 1) Lấy folder hiện tại
+    const pathParts = window.location.pathname.split("/").filter(Boolean);
+    const currentFolder = pathParts[0] || "";
+
+    // 2) Query Supabase
+    const { data, error } = await supabase
+      .from("template_list")
+      .select("id, template_status")
+      .eq("folder_name", currentFolder)
+      .maybeSingle();
+
+    if (error || !data || Number(data.status) !== 0) {
+      window.location.href = "/error.html";
+      return;
+    }
+
+    // 3) Cảnh báo console
+    console.log("%cSTOP!", "font-size:48px;font-weight:bold;color:red;");
+    console.log(
+      "%cĐây là khu vực nhà phát triển. Đừng dán code lạ vào đây!",
+      "font-size:16px"
+    );
+
     const isMobile = /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent);
 
     if (isMobile) {
@@ -74,7 +98,7 @@ async function checkAccess() {
         if (gapW > 300 || gapH > 300) return true;
 
         const t0 = performance.now();
-        for (let i = 0; i < 1e5; i++); // tạo jitter
+        for (let i = 0; i < 1e5; i++);
         const t1 = performance.now();
         return t1 - t0 > 200;
       };
@@ -95,7 +119,7 @@ async function checkAccess() {
     // --- Self-defending ---
     setInterval(() => {
       const t0 = performance.now();
-      debugger; // trick phát hiện mở DevTools
+      debugger; // trick
       if (performance.now() - t0 > 200) {
         window.location.href = "/error.html";
       }
@@ -104,12 +128,9 @@ async function checkAccess() {
     console.error("Lỗi checkAccess:", err);
     window.location.href = "/error.html";
   } finally {
-    // Luôn hiện lại nội dung sau khi kiểm tra xong
+    // Luôn hiện lại nội dung
     document.body.style.visibility = "visible";
   }
 }
 
-// Gọi checkAccess khi DOM sẵn sàng
-window.addEventListener("DOMContentLoaded", () => {
-  checkAccess();
-});
+window.addEventListener("DOMContentLoaded", checkAccess);

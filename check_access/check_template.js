@@ -21,18 +21,19 @@ document.addEventListener("DOMContentLoaded", () => {
 
 async function checkAccess() {
   try {
-    // 1) Lấy folder hiện tại
+    // 1) Lấy folder hiện tại (VD: JZPHHhf)
     const pathParts = window.location.pathname.split("/").filter(Boolean);
-    const currentFolder = pathParts[0] || "";
+    const currentFolder = pathParts[pathParts.length - 1] || "";
 
-    // 2) Query Supabase
+    // 2) Kiểm tra Supabase
     const { data, error } = await supabase
       .from("template_list")
       .select("id, template_status")
       .eq("folder_name", currentFolder)
       .maybeSingle();
 
-    if (error || !data || Number(data.status) !== 0) {
+    // 3) Kiểm tra kết quả
+    if (error || !data || Number(data.template_status) !== 0) {
       window.location.href = "/error.html";
       return;
     }

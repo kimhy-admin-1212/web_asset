@@ -23,6 +23,14 @@ async function checkAccess() {
   try {
     // 1) Lấy folder hiện tại (VD: JZPHHhf)
     const pathParts = window.location.pathname.split("/").filter(Boolean);
+
+    // Nếu phần cuối có đuôi .html → loại bỏ nó
+    const lastPart = pathParts[pathParts.length - 1];
+    if (lastPart && lastPart.endsWith(".html")) {
+      pathParts.pop();
+    }
+
+    // Lấy folder hiện tại sau khi đã lọc
     const currentFolder = pathParts[pathParts.length - 1] || "";
 
     // 2) Kiểm tra Supabase
